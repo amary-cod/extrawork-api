@@ -1,5 +1,5 @@
 {
-  "name": "extrawork-api",
+  "name": "extrawork-api-app",
   "version": "1.0.0",
   "main": "work.script.js",
   "scripts": {
