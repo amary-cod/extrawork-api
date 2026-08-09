@@ -1,19 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const dns = require('dns');
+
+// إجبار النظام على استخدام Google DNS لحل مشكلة querySrv ENOTFOUND
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const app = express();
-
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
-const MONGO_URI = "mongodb+srv://Admin:fatmah12@cluster0.edsncdq.mongodb.net/extrawork_db?appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://Admin:fatmah12@cluster0.edsncdq.mongodb.net/extrawork?retryWrites=true&w=majority";
 
-mongoose.connect(MONGO_URI)
-    .then(() => console.log("Successfully connected to the database"))
-    .catch((err) => console.error("Database connection error:", err));
-
-// Schema تسجيل الدخول
+mongoose.connect(MONGO_URI, { family: 4 })
+  .then(() => console.log("SUCCESS: Connected to MongoDB!"))
+  .catch((err) => console.error("Database connection error:", err));// Schema تسجيل الدخول
 const userLoginSchema = new mongoose.Schema({
     userName: String,
     userLocation: String,
