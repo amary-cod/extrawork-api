@@ -67,7 +67,6 @@ app.post("/api/register", async (req, res) => {
   } catch (error) {
   res.status(400).json({ status: "error", message: error.message });
 }
-  }
 });
 
 app.post("/api/login", async (req, res) => {
