@@ -1,13 +1,15 @@
 {
   "name": "extrawork-api-app",
   "version": "1.0.0",
-  "main": "work.script.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node work.script.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "mongoose": "^7.0.0"
+    "mongoose": "^7.0.0",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2"
   }
 }
