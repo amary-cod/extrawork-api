@@ -65,22 +65,26 @@ app.post("/api/register", async (req, res) => {
     await newUser.save();
     res.status(201).json({ status: "success", message: "User registered successfully" });
   } catch (error) {
-  res.status(400).json({ status: "error", message: error.message });
-}
+    res.status(400).json({ status: "error", message: error.message });
+  }
 });
 
 app.post("/api/login", async (req, res) => {
+  console.log("Login attempt:", req.body.email);
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email, password });
+    console.log("User found:", user ? "yes" : "no");
 
     if (!user) {
       return res.status(401).json({ status: "error", message: "Invalid email or password" });
     }
 
+    console.log("SECRET_KEY exists:", !!SECRET_KEY);
     const token = jwt.sign({ id: user._id, email: user.email }, SECRET_KEY, { expiresIn: "7d" });
     res.json({ status: "success", token, name: user.name });
   } catch (error) {
+    console.error("Login error details:", error.message, error.stack);
     res.status(500).json({ status: "error", message: "Internal server error" });
   }
 });
@@ -146,6 +150,3 @@ app.delete("/api/extrawork/:id", authenticateToken, async (req, res) => {
 // Server Listener
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-
