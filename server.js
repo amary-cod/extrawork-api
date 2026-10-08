@@ -1,5 +1,5 @@
 require('dotenv').config();
-
+require("dns").setDefaultResultOrder("ipv4first");
 const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -121,7 +121,11 @@ app.post("/api/forgot-password", async (req, res) => {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+port: 465,
+secure: true,
+family: 4,
+connectionTimeout: 15000,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
