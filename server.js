@@ -15,11 +15,14 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 let serviceAccount;
 try {
-  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-} catch (e) {
-  console.log("Warning: FIREBASE_SERVICE_ACCOUNT env variable not found. Trying local file.");
-  serviceAccount = require("./serviceAccountKey.json");
-}
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  } else {
+    throw new Error("FIREBASE_SERVICE_ACCOUNT is missing");
+  }
+} catch (error) {
+  console.error("❌ Failed to parse Firebase service account:", error.message);
+  process.exit(1);}
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
