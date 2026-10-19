@@ -11,8 +11,15 @@ const { Resend } = require("resend");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const admin = require("firebase-admin");
-const serviceAccount = require("./serviceAccountKey.json");
+const const admin = require("firebase-admin");
+
+let serviceAccount;
+try {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} catch (e) {
+  console.log("Warning: FIREBASE_SERVICE_ACCOUNT env variable not found. Trying local file.");
+  serviceAccount = require("./serviceAccountKey.json");
+}
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
