@@ -11,6 +11,15 @@ const { Resend } = require("resend");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const admin = require("firebase-admin");
+const serviceAccount = require("./serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+console.log("✅ Firebase Admin initialized successfully!");
+
 const app = express();
 app.use(express.json());
 app.use(cors());
