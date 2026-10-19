@@ -11,24 +11,18 @@ const { Resend } = require("resend");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
- const admin = require("firebase-admin");
+const { initializeApp, cert } = require("firebase-admin/app");
 
 let serviceAccount;
 try {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-  } else {
-    throw new Error("FIREBASE_SERVICE_ACCOUNT is missing");
-  }
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 } catch (error) {
-  console.error("❌ Failed to parse Firebase service account:", error.message);
-  process.exit(1);}
+  console.error("Failed to read FIREBASE_SERVICE_ACCOUNT:", error.message);
+  process.exit(1);
+}
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
-console.log("✅ Firebase Admin initialized successfully!");
+initializeApp({ credential: cert(serviceAccount) });
+console.log("Firebase Admin initialized successfully!");
 
 const app = express();
 app.use(express.json());
