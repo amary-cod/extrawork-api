@@ -11,7 +11,7 @@ const { Resend } = require("resend");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const const admin = require("firebase-admin");
+ const admin = require("firebase-admin");
 
 let serviceAccount;
 try {
