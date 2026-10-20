@@ -12,6 +12,7 @@ const { Resend } = require("resend");
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const { initializeApp, cert } = require("firebase-admin/app");
+const { getAuth } = require("firebase-admin/auth");
 
 let serviceAccount;
 try {
@@ -38,7 +39,7 @@ mongoose.connect(MONGO_URI)
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date }
 });
@@ -104,6 +105,9 @@ app.post("/api/login", async (req, res) => {
     if (!user) {
       return res.status(401).json({ status: "error", message: "Invalid email or password" });
     }
+if (!user.password) {
+  return res.status(401).json({ status: "error", message: "This account uses Google sign-in" });
+}
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -116,6 +120,32 @@ app.post("/api/login", async (req, res) => {
   } catch (error) {
     console.error("Login error details:", error.message, error.stack);
     res.status(500).json({ status: "error", message: "Internal server error" });
+  }
+});
+
+app.post("/api/google-login", async (req, res) => {
+  try {
+    const { idToken } = req.body;
+
+    const decoded = await getAuth().verifyIdToken(idToken);
+    if (!decoded.email || !decoded.email_verified) {
+      return res.status(401).json({ status: "error", message: "Email not verified" });
+    }
+
+    const email = decoded.email;
+    const name = decoded.name || email;
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = new User({ name, email });
+      await user.save();
+    }
+
+    const token = jwt.sign({ id: user._id, email: user.email }, SECRET_KEY, { expiresIn: "7d" });
+    res.json({ status: "success", token, name: user.name });
+  } catch (error) {
+    console.error("Google login error:", error.message);
+    res.status(401).json({ status: "error", message: "Google login failed" });
   }
 });
 
