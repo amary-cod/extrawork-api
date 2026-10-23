@@ -238,7 +238,10 @@ app.post("/api/extrawork", authenticateToken, async (req, res) => {
     const savedSession = await newSession.save();
     res.status(201).json(savedSession);
   } catch (error) {
-    res.status(400).json({ message: "Failed to save work session" });
+
+
+    console.error("Save session error:", error.message);
+    res.status(400).json({ message: "Failed to save work session: " + error.message });
   }
 });
 
